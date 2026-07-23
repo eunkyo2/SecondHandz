@@ -45,5 +45,5 @@ def room(request, room_id):
         raise PermissionDenied
     return render(request, "chat/room.html", {
         "room": chat_room,
-        "messages": chat_room.messages.select_related("sender"),
+        "chat_messages": chat_room.messages.select_related("sender"),
     })
