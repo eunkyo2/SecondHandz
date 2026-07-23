@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>신고건 조회</h2>
+<div style="overflow-x:auto;">
+<table style="width:100%;border-collapse:collapse;background:var(--paper);border-radius:12px;overflow:hidden;">
+  <thead>
+    <tr style="background:var(--yellow);text-align:left;">
+      <th style="padding:12px 14px;">신고자</th>
+      <th style="padding:12px 14px;">신고 대상</th>
+      <th style="padding:12px 14px;">신고 사유</th>
+      <th style="padding:12px 14px;">증거 사진</th>
+      <th style="padding:12px 14px;">상태</th>
+      <th style="padding:12px 14px;">접수일</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+    <tr style="border-top:1px solid #F0E8DB;">
+      <td style="padding:12px 14px;">
+        <a href="{% url 'profile' item.report.reporter.username %}">{{ item.report.reporter.username }}</a>
+      </td>
+      <td style="padding:12px 14px;">
+        {% if item.report.target_type == "user" %}
+          {% if item.target %}
+            <a href="{% url 'profile' item.target.username %}">{{ item.target.username }}</a>
+          {% else %}
+            (삭제된 유저 #{{ item.report.target_id }})
+          {% endif %}
+        {% else %}
+          {% if item.target %}
+            <a href="{% url 'product_detail' item.target.pk %}">{{ item.target.title }}</a> (상품)
+          {% else %}
+            (삭제된 상품 #{{ item.report.target_id }})
+          {% endif %}
+        {% endif %}
+      </td>
+      <td style="padding:12px 14px;max-width:280px;">{{ item.report.reason }}</td>
+      <td style="padding:12px 14px;">
+        {% if item.report.evidence_image %}
+          <a href="{{ item.report.evidence_image.url }}" target="_blank">
+            <img src="{{ item.report.evidence_image.url }}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;">
+          </a>
+        {% else %}
+          <span style="color:#c9b98a;">없음</span>
+        {% endif %}
+      </td>
+      <td style="padding:12px 14px;">{{ item.report.get_status_display }}</td>
+      <td style="padding:12px 14px;white-space:nowrap;">{{ item.report.created_at|date:"Y-m-d H:i" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td style="padding:16px;" colspan="6">접수된 신고가 없습니다.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

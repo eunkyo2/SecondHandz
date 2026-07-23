@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="profile-header">
+  {% if profile_user.profile_image %}
+    <img src="{{ profile_user.profile_image.url }}" class="avatar-lg">
+  {% else %}
+    <div class="avatar-lg avatar-placeholder">👤</div>
+  {% endif %}
+  <div class="profile-info">
+    <div class="profile-info-top">
+      <h2>{{ profile_user.nickname|default:profile_user.username }}</h2>
+      {% if is_owner %}
+        <button type="button" id="edit-toggle-btn" class="btn-secondary">프로필 편집</button>
+        {% if profile_user.is_staff %}
+          <a href="{% url 'report_list' %}"><button type="button" class="btn-secondary">신고건 조회</button></a>
+          <a href="{% url 'dormant_list' %}"><button type="button" class="btn-secondary">휴면계정 관리</button></a>
+          <a href="{% url 'product_blocked_list' %}"><button type="button" class="btn-secondary">차단된 게시물 관리</button></a>
+        {% endif %}
+      {% else %}
+        <a href="{% url 'report_create' %}?target_type=user&target_id={{ profile_user.pk }}"><button type="button" style="background:#c9a58a;">신고하기</button></a>
+        {% if transfer_form %}
+          <button type="button" id="transfer-toggle-btn" class="btn-secondary">송금하기</button>
+        {% endif %}
+      {% endif %}
+    </div>
+    <div class="profile-stats">
+      <span><strong>{{ products.count }}</strong> 상품</span>
+      {% if is_owner %}<span><strong>{{ profile_user.balance }}원</strong> 잔액</span>{% endif %}
+    </div>
+    <p class="profile-bio">{{ profile_user.bio|default:"소개가 없습니다." }}</p>
+  </div>
+</div>
+
+{% if is_owner %}
+<div class="card" id="edit-panel" style="max-width:480px;margin:0 auto 28px;{% if not form.errors %}display:none;{% endif %}">
+  <h3 style="margin-top:0;">프로필 편집</h3>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">저장하기</button>
+  </form>
+  <hr style="margin:20px 0;border:none;border-top:1px solid #F0E8DB;">
+  <h3>비밀번호 변경</h3>
+  <form method="post" action="{% url 'change_password' profile_user.username %}">
+    {% csrf_token %}
+    {{ password_form.as_p }}
+    <button type="submit">비밀번호 변경</button>
+  </form>
+</div>
+{% elif transfer_form %}
+<div class="card" id="transfer-panel" style="max-width:420px;margin:0 auto 28px;display:none;">
+  <h3 style="margin-top:0;">송금하기</h3>
+  <form method="post" action="{% url 'transfer' profile_user.username %}">
+    {% csrf_token %}
+    {{ transfer_form.amount.label_tag }}{{ transfer_form.amount }}
+    <button type="submit">보내기</button>
+  </form>
+</div>
+{% endif %}
+
+<div id="products-section" {% if is_owner and form.errors %}style="display:none;"{% endif %}>
+<h3 style="margin:0 0 12px;">{% if is_owner %}내가 올린 상품{% else %}판매중인 상품{% endif %}</h3>
+<div class="product-grid">
+  {% for product in products %}
+  <a href="{% url 'product_detail' product.pk %}" class="product-card">
+    <div class="product-thumb">
+      {% if product.image %}<img src="{{ product.image.url }}">{% else %}<span>이미지 없음</span>{% endif %}
+    </div>
+    <div class="product-info">
+      <strong style="display:block;margin-bottom:4px;">{{ product.title }}</strong>
+      <span class="product-price">{{ product.price }}원</span>
+      {% if product.is_sold %}<span style="color:#c0392b;font-size:0.85em;"> (판매완료)</span>{% endif %}
+      {% if product.is_blocked %}<span style="color:#c0392b;font-size:0.85em;"> (차단됨)</span>{% endif %}
+    </div>
+  </a>
+  {% empty %}
+  <p>등록된 상품이 없습니다.</p>
+  {% endfor %}
+</div>
+</div>
+
+<script>
+(function () {
+  function bindToggle(btnId, panelId, hideId) {
+    var btn = document.getElementById(btnId);
+    var panel = document.getElementById(panelId);
+    var hideTarget = hideId ? document.getElementById(hideId) : null;
+    if (!btn || !panel) return;
+    btn.addEventListener("click", function () {
+      var opening = panel.style.display === "none";
+      panel.style.display = opening ? "block" : "none";
+      if (hideTarget) hideTarget.style.display = opening ? "none" : "block";
+    });
+  }
+  bindToggle("edit-toggle-btn", "edit-panel", "products-section");
+  bindToggle("transfer-toggle-btn", "transfer-panel", null);
+})();
+</script>
+{% endblock %}

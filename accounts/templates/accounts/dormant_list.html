@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>휴면 계정 관리</h2>
+<div style="overflow-x:auto;">
+<table style="width:100%;border-collapse:collapse;background:var(--paper);border-radius:12px;overflow:hidden;">
+  <thead>
+    <tr style="background:var(--yellow);text-align:left;">
+      <th style="padding:12px 14px;">아이디</th>
+      <th style="padding:12px 14px;">닉네임</th>
+      <th style="padding:12px 14px;">가입일</th>
+      <th style="padding:12px 14px;">관리</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for u in users %}
+    <tr style="border-top:1px solid #F0E8DB;">
+      <td style="padding:12px 14px;"><a href="{% url 'profile' u.username %}">{{ u.username }}</a></td>
+      <td style="padding:12px 14px;">{{ u.nickname|default:"-" }}</td>
+      <td style="padding:12px 14px;">{{ u.date_joined|date:"Y-m-d" }}</td>
+      <td style="padding:12px 14px;">
+        <form method="post" action="{% url 'dormant_restore' u.pk %}" style="margin:0;">
+          {% csrf_token %}
+          <button type="submit" class="btn-secondary">휴면 해제</button>
+        </form>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td style="padding:16px;" colspan="4">휴면 계정이 없습니다.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

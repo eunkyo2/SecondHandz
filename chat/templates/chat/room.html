@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="max-width:500px;">
+  <a href="{% url 'product_detail' room.product.pk %}" style="display:flex;gap:12px;align-items:center;text-decoration:none;color:var(--ink);background:#FBF7EE;border:1px solid #F0E8DB;border-radius:10px;padding:10px;margin-bottom:16px;">
+    <div style="width:56px;height:56px;flex:none;border-radius:8px;overflow:hidden;background:var(--yellow);display:flex;align-items:center;justify-content:center;">
+      {% if room.product.image %}<img src="{{ room.product.image.url }}" style="width:100%;height:100%;object-fit:cover;">{% else %}<span style="font-size:0.7em;color:#c9b98a;">이미지 없음</span>{% endif %}
+    </div>
+    <div>
+      <strong style="display:block;">{{ room.product.title }}</strong>
+      <span class="product-price">{{ room.product.price }}원</span>
+      {% if room.product.is_sold %}<span style="color:#c0392b;font-size:0.85em;"> (판매완료)</span>{% endif %}
+    </div>
+  </a>
+
+  <div id="chat-log" style="height:300px;overflow-y:auto;background:#fff;border-radius:8px;padding:10px;margin-bottom:10px;">
+    {% for msg in messages %}
+    <div><strong><a href="{% url 'profile' msg.sender.username %}" style="color:var(--ink);">{{ msg.sender.nickname|default:msg.sender.username }}</a>:</strong> {{ msg.content }}</div>
+    {% endfor %}
+  </div>
+  <input id="chat-input" type="text" maxlength="1000" placeholder="메시지 입력">
+  <button id="chat-send" type="button">보내기</button>
+</div>
+<script>
+(function () {
+  const roomId = {{ room.pk }};
+  const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+  const socket = new WebSocket(protocol + "://" + window.location.host + "/ws/chat/" + roomId + "/");
+  const log = document.getElementById("chat-log");
+  const input = document.getElementById("chat-input");
+
+  function appendMessage(username, displayName, message) {
+    const div = document.createElement("div");
+    const strong = document.createElement("strong");
+    if (username === "system") {
+      strong.textContent = displayName + ": ";
+    } else {
+      const link = document.createElement("a");
+      link.href = "/accounts/" + encodeURIComponent(username) + "/";
+      link.style.color = "var(--ink)";
+      link.textContent = displayName;
+      strong.appendChild(link);
+      strong.appendChild(document.createTextNode(": "));
+    }
+    div.appendChild(strong);
+    div.appendChild(document.createTextNode(message));
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  socket.onmessage = function (e) {
+    const data = JSON.parse(e.data);
+    if (data.error) {
+      appendMessage("system", "system", data.error);
+      return;
+    }
+    appendMessage(data.username, data.display_name, data.message);
+  };
+
+  function send() {
+    const message = input.value.trim();
+    if (!message || socket.readyState !== WebSocket.OPEN) return;
+    socket.send(JSON.stringify({ message: message }));
+    input.value = "";
+  }
+
+  document.getElementById("chat-send").addEventListener("click", send);
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") send();
+  });
+})();
+</script>
+{% endblock %}

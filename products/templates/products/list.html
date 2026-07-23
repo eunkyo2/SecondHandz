@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero">
+  <div>
+    <h2 style="margin:0 0 6px;">오늘의 중고 거래</h2>
+    <p style="margin:0;color:#7a6f60;">안 쓰는 물건, 모두에게 나눠보세요</p>
+  </div>
+  {% if user.is_authenticated %}<a href="{% url 'product_create' %}"><button type="button">상품 등록</button></a>{% endif %}
+</div>
+<form method="get" style="max-width:400px;margin:0 0 20px;display:flex;gap:8px;">
+  <input type="text" name="q" value="{{ query }}" maxlength="100" placeholder="상품 검색" style="margin:0;">
+  <button type="submit" style="flex:none;">검색</button>
+</form>
+<div class="product-grid">
+  {% for product in products %}
+  <a href="{% url 'product_detail' product.pk %}" class="product-card">
+    <div class="product-thumb">
+      {% if product.image %}
+        <img src="{{ product.image.url }}">
+      {% else %}
+        <span>이미지 없음</span>
+      {% endif %}
+    </div>
+    <div class="product-info">
+      <strong style="display:block;margin-bottom:4px;">{{ product.title }}</strong>
+      <span class="product-price">{{ product.price }}원</span>
+    </div>
+  </a>
+  {% empty %}
+  <p>등록된 상품이 없습니다.</p>
+  {% endfor %}
+</div>
+{% endblock %}

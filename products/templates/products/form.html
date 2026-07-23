@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>{% if editing %}상품 수정{% else %}상품 등록{% endif %}</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{% if editing %}수정하기{% else %}등록하기{% endif %}</button>
+  </form>
+</div>
+{% endblock %}

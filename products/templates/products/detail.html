@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="max-width:600px;">
+  <h2>{{ product.title }}</h2>
+  {% if product.image %}<img src="{{ product.image.url }}" style="max-width:100%;border-radius:8px;">{% endif %}
+  <p>{{ product.description }}</p>
+  <p><strong>{{ product.price }}원</strong></p>
+  <p>판매자: <a href="{% url 'profile' product.seller.username %}">{{ product.seller.nickname|default:product.seller.username }}</a></p>
+  {% if product.is_sold %}<p style="color:#c0392b;">판매완료된 상품입니다.</p>{% endif %}
+
+  {% if user == product.seller %}
+  <a href="{% url 'product_edit' product.pk %}"><button type="button">수정하기</button></a>
+  <form method="post" action="{% url 'product_toggle_sold' product.pk %}" style="display:inline;margin-left:8px;">
+    {% csrf_token %}
+    <button type="submit">{% if product.is_sold %}판매중으로 변경{% else %}판매완료로 표시{% endif %}</button>
+  </form>
+  <form method="post" action="{% url 'product_delete' product.pk %}" style="display:inline;margin-left:8px;">
+    {% csrf_token %}
+    <button type="submit">삭제하기</button>
+  </form>
+  {% else %}
+    {% if not product.is_sold %}
+    <form method="post" action="{% url 'buy' product.pk %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit">채팅으로 문의하기</button>
+    </form>
+    {% endif %}
+    <a href="{% url 'report_create' %}?target_type=product&target_id={{ product.pk }}"><button type="button" style="background:#c9a58a;">신고하기</button></a>
+  {% endif %}
+</div>
+{% endblock %}

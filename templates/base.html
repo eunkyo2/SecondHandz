@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Second handz</title>
+<style>
+  :root {
+    --sky: #DCEEF4;
+    --pink: #F6DDE2;
+    --yellow: #FBF0CE;
+    --ink: #5b5248;
+    --accent: #EFA98D;
+    --paper: #FFFDF9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", "Apple SD Gothic Neo", sans-serif;
+    background: #FBF7F0;
+    color: var(--ink);
+    margin: 0;
+  }
+  header {
+    background: var(--paper);
+    border-bottom: 1px solid #EFE6D8;
+    padding: 14px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header .brand { color: var(--ink); text-decoration: none; font-weight: 700; font-size: 1.2em; }
+  header nav a { color: #8a7f70; text-decoration: none; margin-left: 16px; font-size: 0.95em; }
+  header nav a:hover { color: var(--ink); }
+  header nav span { color: var(--ink); font-weight: 600; margin-left: 16px; }
+  main { padding: 28px; max-width: 960px; margin: 0 auto; }
+  .card {
+    background: var(--paper);
+    border: 1px solid #F0E8DB;
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 420px;
+    margin: 0 auto;
+    box-shadow: 0 4px 14px rgba(150,120,90,0.08);
+  }
+  .card h2 { margin-top: 0; }
+  input, textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 10px;
+    margin: 6px 0 14px;
+    border: 1px solid #E4DACB;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.95em;
+  }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95em;
+  }
+  button:hover { background: #E8987A; }
+  a button { display: inline-block; }
+  .errorlist { color: #c0392b; list-style: none; padding: 0; }
+  .hero {
+    background: linear-gradient(135deg, var(--sky), var(--pink));
+    border-radius: 18px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 18px;
+  }
+  .product-card {
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid #F0E8DB;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(150,120,90,0.07);
+    display: block;
+  }
+  .product-thumb {
+    aspect-ratio: 1/1;
+    background: var(--yellow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .product-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .product-thumb span { color: #c9b98a; font-size: 0.85em; }
+  .product-info { padding: 12px 14px; }
+  .product-price { color: var(--accent); font-weight: 700; }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    object-fit: cover; background: var(--yellow);
+    display: inline-block; vertical-align: middle;
+  }
+  .profile-header { display: flex; gap: 28px; align-items: center; margin-bottom: 28px; flex-wrap: wrap; }
+  .avatar-lg {
+    width: 120px; height: 120px; border-radius: 50%; flex: none;
+    object-fit: cover; background: var(--yellow);
+  }
+  .avatar-placeholder { display: flex; align-items: center; justify-content: center; font-size: 2.6em; }
+  .profile-info { flex: 1; min-width: 240px; }
+  .profile-info-top { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .profile-info-top h2 { margin: 0; }
+  .profile-stats { display: flex; gap: 24px; margin: 12px 0; color: #8a7f70; }
+  .profile-stats strong { color: var(--ink); }
+  .profile-bio { margin: 0; color: var(--ink); }
+  button.btn-secondary { background: #F0E8DB; color: var(--ink); }
+  button.btn-secondary:hover { background: #E4DACB; }
+  .toast {
+    max-width: 640px;
+    margin: 0 auto 20px;
+    padding: 14px 22px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+  }
+  .toast-success { background: #E8F4EA; color: #3d7a4a; }
+  .toast-error { background: #FBE8E8; color: #c0392b; }
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="{% url 'home' %}">Second handz</a>
+  <nav>
+    {% if user.is_authenticated %}
+      <a href="{% url 'chat_list' %}" title="채팅" style="font-size:1.2em;">💬</a>
+      <a href="{% url 'profile' user.username %}">{{ user.nickname|default:user.username }}님</a>
+      <a href="{% url 'logout' %}">로그아웃</a>
+    {% else %}
+      <a href="{% url 'login' %}">로그인</a>
+      <a href="{% url 'signup' %}">회원가입</a>
+    {% endif %}
+  </nav>
+</header>
+<main>
+{% if messages %}
+  {% for message in messages %}
+    <p class="toast {% if message.tags == 'error' %}toast-error{% else %}toast-success{% endif %}">{{ message }}</p>
+  {% endfor %}
+{% endif %}
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>

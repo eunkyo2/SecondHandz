@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>채팅</h2>
+<div style="max-width:500px;display:flex;flex-direction:column;gap:10px;">
+  <a href="{% url 'chat_global' %}" style="display:flex;gap:12px;align-items:center;text-decoration:none;color:var(--ink);background:var(--hero,var(--sky));background:linear-gradient(135deg,var(--sky),var(--pink));border-radius:12px;padding:12px;font-weight:700;">
+    🌐 전체 채팅 (모든 유저와 대화하기)
+  </a>
+  {% for item in room_items %}
+  <a href="{% url 'chat_room' item.room.pk %}" style="display:flex;gap:12px;align-items:center;text-decoration:none;color:var(--ink);background:var(--paper);border:1px solid #F0E8DB;border-radius:12px;padding:12px;">
+    <div style="width:52px;height:52px;flex:none;border-radius:8px;overflow:hidden;background:var(--yellow);display:flex;align-items:center;justify-content:center;">
+      {% if item.room.product.image %}<img src="{{ item.room.product.image.url }}" style="width:100%;height:100%;object-fit:cover;">{% else %}<span style="font-size:0.7em;color:#c9b98a;">이미지</span>{% endif %}
+    </div>
+    <div style="min-width:0;">
+      <strong style="display:block;">{{ item.room.product.title }}</strong>
+      <span style="color:#8a7f70;font-size:0.9em;">{{ item.other.nickname|default:item.other.username }}</span>
+      {% if item.last_message %}
+        <div style="color:#8a7f70;font-size:0.85em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ item.last_message.content }}</div>
+      {% endif %}
+    </div>
+  </a>
+  {% empty %}
+  <p>진행중인 채팅이 없습니다.</p>
+  {% endfor %}
+</div>
+{% endblock %}
