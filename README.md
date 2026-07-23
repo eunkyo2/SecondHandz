@@ -38,8 +38,8 @@
 ### 2. 저장소 클론 및 가상환경 설정
 
 ```bash
-git clone <이 저장소 URL>
-cd Secure_coding_web
+git clone https://github.com/eunkyo2/SecondHandz
+cd SecondHandz
 python -m venv .venv
 .venv\Scripts\activate       # Windows
 # source .venv/bin/activate  # macOS/Linux
@@ -53,6 +53,12 @@ pip install -r requirements.txt
 ```
 SECRET_KEY=원하는-임의의-긴-문자열
 DEBUG=True
+```
+
+`SECRET_KEY`는 아래 명령으로 안전하게 무작위 문자열을 생성해서 사용할 수 있습니다.
+
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 ```
 
 ### 4. 데이터베이스 마이그레이션
