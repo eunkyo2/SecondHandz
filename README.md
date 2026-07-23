@@ -41,18 +41,8 @@
 git clone https://github.com/eunkyo2/SecondHandz
 cd SecondHandz
 python -m venv .venv
-```
-
-가상환경 활성화(사용하는 셸에 맞는 것 하나만 실행):
-
-```bash
-.venv\Scripts\activate.bat       # Windows cmd
-.venv\Scripts\Activate.ps1       # Windows PowerShell
-source .venv/Scripts/activate    # Windows Git Bash
-source .venv/bin/activate        # macOS/Linux
-```
-
-```bash
+.venv\Scripts\activate       # Windows
+# source .venv/bin/activate  # macOS/Linux
 pip install -r requirements.txt
 ```
 
