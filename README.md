@@ -61,7 +61,7 @@ DEBUG=True
 python manage.py migrate
 ```
 
-### 5. 관리자 계정 생성
+이 명령 한 번으로 `admin` / `1234@` 관리자 계정이 자동으로 생성됩니다(마이그레이션에 포함된 시딩 코드). 별도로 `createsuperuser`를 실행할 필요는 없으며, 추가 관리자 계정이 필요할 때만 아래 명령을 사용하면 됩니다.
 
 ```bash
 python manage.py createsuperuser
